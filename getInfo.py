@@ -20,19 +20,11 @@ def wxUnderSoup(city, state):
 
 def getCoords(city, state):
   soup = wxUnderSoup(city, state)
-  latLon = soup.find_all('span', class_='subheading')
-  coordsDict = {}
+  coords = soup.find_all('strong')
+  lat = coords[1].text
+  lon = str(-1*float(coords[2].text))
 
-  for item in latLon:
-    coords = item.text
-
-  # this works because all latitudes for the US on that website are two digits with two decimal places
-  coordsDict['lat'] = float(coords[0:5])
-  # all longitudes in the united states are west, so it will always be a negative value
-  # this also accounts for two and three digit numbers. if the number is two digits, the extra whitespace gets taken out when the str is turned into a float
-  coordsDict['lon'] = -float(coords[10:16]) 
-
-  return coordsDict
+  return lat, lon
 
 def weather(lat, lon, apiKey):
   part = 'minutely, hourly'
@@ -42,9 +34,7 @@ def weather(lat, lon, apiKey):
   return wxJson
 
 def getForecast(city, state):
-  coordsDict = getCoords('Portland', 'ME')
-  cityLat = coordsDict['lat']
-  cityLon = coordsDict['lon']
+  cityLat, cityLon = getCoords(city, state)
   wxFC = {'day':[], 'hi':[], 'lo':[], 'wxDescr':[]}
 
   for index in range(1, 5):

@@ -7,6 +7,12 @@ font_med = ('montserrat', 12)
 font_lrg = ('montserrat', 30)
 font_xl = ('montserrat', 50, 'bold')
 dg = u'\N{degree sign}'
+SUNNY = ['Clear', 'Sunny', 'Fair']
+RAIN = ['Rain']
+PARTLY_CLOUDY = ["Mostly Cloudy", "Partly Cloudy"]
+CLOUDS = ['Clouds', 'Cloudy']
+SNOW = ['Snow']
+STORM = ['Thunderstorm']
 
 def submit():
   city = city_entry.get()
