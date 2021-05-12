@@ -31,6 +31,7 @@ def weather(lat, lon, apiKey):
   url = f'https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude={part}&appid={apiKey}&units=imperial'
   response = r.get(url)
   wxJson = response.json()
+  
   return wxJson
 
 def getForecast(city, state):

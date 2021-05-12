@@ -1,5 +1,6 @@
 import tkinter as tk
 import getInfo as gi
+from PIL import Image, ImageTk
 
 bg = 'DeepSkyBlue3'
 font_small = ('montserrat', 10)
@@ -7,12 +8,12 @@ font_med = ('montserrat', 12)
 font_lrg = ('montserrat', 30)
 font_xl = ('montserrat', 50, 'bold')
 dg = u'\N{degree sign}'
-SUNNY = ['Clear', 'Sunny', 'Fair']
-RAIN = ['Rain']
-PARTLY_CLOUDY = ["Mostly Cloudy", "Partly Cloudy"]
-CLOUDS = ['Clouds', 'Cloudy']
-SNOW = ['Snow']
-STORM = ['Thunderstorm']
+sunny = ['Clear', 'Sunny', 'Fair']
+rain = ['Rain']
+partly_cloudy = ["Mostly Cloudy", "Partly Cloudy"]
+clouds = ['Clouds', 'Cloudy']
+snow = ['Snow']
+storm = ['Thunderstorm']
 
 def submit():
   city = city_entry.get()
@@ -40,17 +41,21 @@ def submit():
   state_entry.delete(0, 20)
 
 def fill_current(wx_dict):
-  current, feels, date_time, wind_spd, condition, humidity, hi, lo = wx_dict['current'], wx_dict['feels'], wx_dict['dateTime'], wx_dict['windSpd'], wx_dict['condition'], wx_dict['humidity'], wx_dict['hi'], wx_dict['lo']
+  current, feels, date_time, wind_spd, cond, humidity, hi, lo = wx_dict['current'], wx_dict['feels'], wx_dict['dateTime'], wx_dict['windSpd'], wx_dict['condition'], wx_dict['humidity'], wx_dict['hi'], wx_dict['lo']
+
+  condit = get_condition(cond)
+  change_image(wx_icon, condit, 100, 100)
 
   c_temp.configure(text = f'{current}{dg}F')
   fl.configure(text = f'Feels: {feels}')
   time_date.configure(text = f'Last Updated {date_time}')
   winds.configure(text = f'{wind_spd} mph')
-  cond.configure(text = f'{condition}')
+  Cond.configure(text = f'{cond}')
   hum.configure(text= f'{humidity}%')
   hi_lo.configure(text = f'{hi}   |   {lo}')
 
 def fill_forecast(wx_dict):
+  # is there a way to do all of this with a loop? I couldn't figure out how because you have to configure 4 different variables
   icon1_day.configure(text=wx_dict['day'][0])
   icon2_day.configure(text=wx_dict['day'][1])
   icon3_day.configure(text=wx_dict['day'][2])
@@ -70,6 +75,44 @@ def fill_forecast(wx_dict):
   icon2_cond.configure(text=wx_dict['wxDescr'][1])
   icon3_cond.configure(text=wx_dict['wxDescr'][2])
   icon4_cond.configure(text=wx_dict['wxDescr'][3])
+
+  condition1 = get_condition(wx_dict['wxDescr'][0])
+  change_image(icon1, condition1, 50, 50)
+  condition2 = get_condition(wx_dict['wxDescr'][1])
+  change_image(icon2, condition2, 50, 50)
+  condition3 = get_condition(wx_dict['wxDescr'][2])
+  change_image(icon3, condition3, 50, 50)
+  condition4 = get_condition(wx_dict['wxDescr'][3])
+  change_image(icon4, condition4, 50, 50)
+
+def get_condition(condition):
+  if condition in sunny:
+    return 'Sunny'
+  elif condition in rain:
+    return 'Rain'
+  elif condition in partly_cloudy:
+    return 'partly cloudy'
+  elif condition in clouds:
+    return 'Clouds'
+  elif condition in snow:
+    return 'Snow'
+  elif condition in storm:
+    return 'storm'
+
+def load_image(name, width, height):
+  img = Image.open(f'{name}.png')
+  img = img.resize((width, height))
+  img = ImageTk.PhotoImage(img)
+
+  return img
+
+def change_image(label_name, condition, width, height):
+  img = Image.open(f'{condition}.png')
+  img = img.resize((width, height))
+  photo = ImageTk.PhotoImage(img)
+  label_name.configure(image=photo)
+  label_name.img = photo
+  
 
 root = tk.Tk()
 root.geometry('600x400')
@@ -91,7 +134,7 @@ location.place(x=20, y=2, relwidth=0.9, relheight=0.15)
 country = tk.Label(current, text='United States', fg='white', font=font_med, bg=bg)
 country.place(x=23, y=52)
 
-wx_icon = tk.Label(current, fg='white', bg='yellow')
+wx_icon = tk.Label(current, bg = bg)
 wx_icon.place(x=25, y=80, relwidth=0.3, relheight=0.3)
 
 hi_temp = '--'
@@ -113,8 +156,8 @@ time_date.place(x=25, y=180)
 condition_title = tk.Label(current, text='Condition', bg=bg, font=font_med)
 condition_title.place(x=25, y=210)
 
-cond = tk.Label(current, text='--', fg='goldenrod', bg=bg, font=font_med)
-cond.place(x=160, y=210)
+Cond = tk.Label(current, text='--', fg='goldenrod', bg=bg, font=font_med)
+Cond.place(x=160, y=210)
 
 winds_title = tk.Label(current, text='Winds', bg=bg, font=font_med)
 winds_title.place(x=25, y=240)
@@ -129,7 +172,7 @@ hum = tk.Label(current, text='--', fg='goldenrod', bg=bg, font=font_med)
 hum.place(x=160, y=270)
 
 # 5 Day Forecast
-icon1 = tk.Label(forecast, bg='yellow')
+icon1 = tk.Label(forecast, bg = bg)
 icon1.place(x=0, y=70, relwidth=0.3, relheight=0.1)
 
 icon1_day = tk.Label(forecast, text='---', fg='white', font=font_med, bg=bg)
@@ -144,7 +187,7 @@ icon1_hi.place(x=120, y=70)
 icon1_lo = tk.Label(forecast, text='--', fg='red4', font='bold', bg=bg)
 icon1_lo.place(x=120, y=90)
 
-icon2 = tk.Label(forecast, bg='yellow')
+icon2 = tk.Label(forecast, bg=bg)
 icon2.place(x=0, y=140, relwidth=0.3, relheight=0.1)
 
 icon2_day = tk.Label(forecast, text='---', fg='white', font=font_med, bg=bg)
@@ -159,7 +202,7 @@ icon2_hi.place(x=120, y=140)
 icon2_lo = tk.Label(forecast, text='--', fg='red4', font='bold', bg=bg)
 icon2_lo.place(x=120, y=160)
 
-icon3 = tk.Label(forecast, bg='yellow')
+icon3 = tk.Label(forecast, bg=bg)
 icon3.place(x=0, y=210, relwidth=0.3, relheight=0.1)
 
 icon3_day = tk.Label(forecast, text='---', fg='white', font=font_med, bg=bg)
@@ -174,7 +217,7 @@ icon3_hi.place(x=120, y=210)
 icon3_lo = tk.Label(forecast, text='--', fg='red4', font='bold', bg=bg)
 icon3_lo.place(x=120, y=230)
 
-icon4 = tk.Label(forecast, bg='yellow')
+icon4 = tk.Label(forecast, bg=bg)
 icon4.place(x=0, y=280, relwidth=0.3, relheight=0.1)
 
 icon4_day = tk.Label(forecast, text='---', fg='white', font=font_med, bg=bg)
